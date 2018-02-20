@@ -52,6 +52,8 @@ namespace ToDoList.Tests
           List<Item> newList = new List<Item> { newItem1, newItem2 };
 
           //Act
+          newItem1.Save();
+          newItem2.Save();
           List<Item> result = Item.GetAll();
           foreach (Item thisItem in result)
           {
