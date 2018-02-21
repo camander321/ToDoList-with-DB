@@ -11,7 +11,7 @@ namespace ToDoList.Controllers
         public ActionResult Index()
         {
           List<Item> allItems = Item.GetAll();
-          return View("../Index", allItems);
+          return View("~/Views/Home/Index.cshtml", allItems);
         }
 
         [HttpGet("/items/new")]
@@ -28,7 +28,7 @@ namespace ToDoList.Controllers
           Item newItem = new Item (Request.Form["new-description"], parsedDueDate);
           newItem.Save();
           List<Item> allItems = Item.GetAll();
-          return View("Index", allItems);
+          return View("~/Views/Home/Index.cshtml", allItems);
         }
 
         [HttpPost("/items/delete")]

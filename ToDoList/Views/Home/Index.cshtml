@@ -1,18 +1,49 @@
-<h1>To Do List</h1>
-@if (@Model.Count > 0)
-{
-  <h3>No Tasks currently scheduled</h3>
+@{
+  Layout = "_Layout";
 }
 
-<ul>
-  @foreach(var item in Model)
-  {
-    <li>@item.GetDescription()</li>
-  }
-</ul>
+<div class="w3-container">
 
-<p><a href="/items/new">Add another item.</a></p>
+  <br>
+  <div class="w3-container w3-center">
+    @if (@Model.Count == 0)
+    {
+      <h3>No Tasks currently scheduled</h3>
+      <br>
+      <p><a href="/items/new">Add an item.</a></p>
+    }
 
-<form action="/items/delete" method="post">
-  <button type="submit" name="button">Clear All Items</button>
-</form>
+    @if (@Model.Count > 0)
+    {
+      <div class="w3-row">
+        <div class="w3-half w3-container" align="right">
+          <h2>Tasks</h2>
+
+            @foreach(var item in Model)
+            {
+              <li>@item.GetDescription()</li>
+            }
+
+        </div>
+        <div class="w3-half w3-container" align="left">
+          <h2>Due Date</h2>
+
+            @foreach(var item in Model)
+            {
+              <li>@item.GetDueDate()</li>
+            }
+
+        </div>
+      </div>
+      <br>
+      <div class="w3-container">
+      <p><a href="/items/new"> Add another item. </a></p>
+      </div>
+    }
+    <br>
+    <br>
+    <form action="/items/delete" method="post">
+      <button type="submit" name="button">Clear All Items</button>
+    </form>
+  </div>
+</div>
