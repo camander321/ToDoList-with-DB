@@ -5,7 +5,7 @@ using ToDoList.Controllers;
 using ToDoList.Models;
 
 namespace ToDoList.Tests
-// {
+{
 //     [TestClass]
 //     public class ItemsControllerTest
 //     {

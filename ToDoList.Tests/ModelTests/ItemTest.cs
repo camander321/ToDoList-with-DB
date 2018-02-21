@@ -14,7 +14,7 @@ namespace ToDoList.Tests
       }
       public void ItemTests()
       {
-        DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=todo_test;";
+        DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=todolist_test;";
       }
 
       [TestMethod]
@@ -32,7 +32,8 @@ namespace ToDoList.Tests
       {
         //Arrange
         string description = "Walk the dog.";
-        Item newItem = new Item(description, (2018, 3, 1));
+        System.DateTime dueDate = System.DateTime.Today;
+        Item newItem = new Item(description, dueDate);
 
         //Act
         string result = newItem.GetDescription();
@@ -45,7 +46,7 @@ namespace ToDoList.Tests
       public void GetDueDate_ReturnsDueDate_DateTime()
       {
         //Arrange
-        DateTime dueDate = (2018, 3, 1);
+        System.DateTime dueDate = System.DateTime.Today;
         Item newItem = new Item("Do Task", dueDate);
 
         //Act
@@ -55,34 +56,14 @@ namespace ToDoList.Tests
         Assert.AreEqual(dueDate, result);
       }
 
-      [TestMethod]
-      public void GetAll_ReturnsItems_ItemList()
-      {
-        //Arrange
-        string description01 = "Walk the dog";
-        string description02 = "Wash the dishes";
-        Item newItem1 = new Item(description01);
-        Item newItem2 = new Item(description02);
-        List<Item> newList = new List<Item> { newItem1, newItem2 };
-
-        //Act
-        newItem1.Save();
-        newItem2.Save();
-        List<Item> result = Item.GetAll();
-        foreach (Item thisItem in result)
-        {
-          Console.WriteLine("Output: " + thisItem.GetDescription());
-        }
-
-        //Assert
-        CollectionAssert.AreEqual(newList, result);
-      }
 
       [TestMethod]
       public void Save_SavesToDatabase_ItemList()
       {
         //Arrange
-        Item testItem = new Item("Mow the lawn");
+        string description = "Mow the Lawn";
+        System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
+        Item testItem = new Item(description, dueDate);
 
         //Act
         testItem.Save();
@@ -94,10 +75,31 @@ namespace ToDoList.Tests
       }
 
       [TestMethod]
+      public void GetAll_ReturnsItems_ItemList()
+      {
+        //Arrange
+        string description01 = "Walk the dog";
+        string description02 = "Wash the dishes";
+        System.DateTime dueDate = System.DateTime.Today;
+        Item newItem1 = new Item(description01, dueDate);
+        Item newItem2 = new Item(description02, dueDate);
+        List<Item> newList = new List<Item> {newItem1, newItem2};
+
+        //Act
+        newItem1.Save();
+        newItem2.Save();
+        List<Item> result = Item.GetAll();
+
+        //Assert
+        CollectionAssert.AreEqual(newList, result);
+      }
+
+      [TestMethod]
       public void Save_AssignsIdToObject_Id()
       {
         //Arrange
-        Item testItem = new Item("Mow the lawn");
+        System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
+        Item testItem = new Item("Mow the lawn", dueDate);
 
         //Act
         testItem.Save();
@@ -113,19 +115,26 @@ namespace ToDoList.Tests
       [TestMethod]
       public void Equals_ReturnsTrueIfDescriptionsAreTheSame_Item()
       {
-        // Arrange, Act
-        Item firstItem = new Item("Mow the lawn");
-        Item secondItem = new Item("Mow the lawn");
+        // Arrange
+        System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
+        Item firstItem = new Item("Mow the lawn", dueDate);
+        Item secondItem = new Item("Mow the lawn", dueDate);
+
+        //Act
+        firstItem.Save();
+        secondItem.Save();
+
 
         // Assert
-        Assert.AreEqual(firstItem, secondItem);
+        Assert.AreEqual(true, firstItem.GetDescription().Equals(secondItem.GetDescription()));
       }
 
       [TestMethod]
       public void Find_FindsItemInDatabase_Item()
       {
         //Arrange
-        Item testItem = new Item("Mow the lawn");
+        System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
+        Item testItem = new Item("Mow the lawn", dueDate);
         testItem.Save();
 
         //Act
@@ -135,4 +144,4 @@ namespace ToDoList.Tests
         Assert.AreEqual(testItem, foundItem);
       }
     }
-  }
+}

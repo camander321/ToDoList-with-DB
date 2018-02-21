@@ -11,7 +11,7 @@ namespace ToDoList.Controllers
         public ActionResult Index()
         {
           List<Item> allItems = Item.GetAll();
-          return View(allItems);
+          return View("../Index", allItems);
         }
 
         [HttpGet("/items/new")]
@@ -24,7 +24,7 @@ namespace ToDoList.Controllers
         public ActionResult Create()
         {
           string newDueDate = Request.Form["new-duedate"];
-          DateTime parsedDueDate = Convert.ToDateTime(newDueDate);
+          System.DateTime parsedDueDate = System.DateTime.Parse(newDueDate);
           Item newItem = new Item (Request.Form["new-description"], parsedDueDate);
           newItem.Save();
           List<Item> allItems = Item.GetAll();

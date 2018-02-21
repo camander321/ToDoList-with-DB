@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using ToDoList;
 using MySql.Data.MySqlClient;
+using System.Globalization;
 
 namespace ToDoList.Models
 {
@@ -9,7 +10,7 @@ namespace ToDoList.Models
   {
     private int _id;
     private string _description;
-    private DateTime _dueDate;
+    private System.DateTime _dueDate;
 
     public Item(string Description, DateTime DueDate, int Id = 0)
     {
@@ -32,6 +33,11 @@ namespace ToDoList.Models
         bool dueDateEquality = (this.GetDueDate() == newItem.GetDueDate());
         return (idEquality && descriptionEquality && dueDateEquality);
       }
+    }
+
+    public override int GetHashCode()
+    {
+      return this.GetId().GetHashCode();
     }
 
     public int GetId()
@@ -107,7 +113,7 @@ namespace ToDoList.Models
 
      var cmd = conn.CreateCommand() as MySqlCommand;
     //  cmd.CommandText = @"INSERT INTO `items` (`description`) VALUES (@ItemDescription);";
-    cmd.CommandText = @"INSERT INTO `items` (`description', 'dueDate`) VALUES (@ItemDescription, @ItemDueDate);";
+    cmd.CommandText = @"INSERT INTO `items` (description, dueDate) VALUES (@ItemDescription, @ItemDueDate);";
 
      MySqlParameter description = new MySqlParameter();
      description.ParameterName = "@ItemDescription";
