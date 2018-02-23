@@ -1,0 +1,16 @@
+@{
+  Layout = "_Layout";
+}
+
+<div class="w3-container">
+  <hr />
+  <h2>Edit Due Date for @Model.GetDescription()</h2>
+  <form action="/items/@Model.GetId()/duedateupdate" method="post">
+    <label for="dueDate">Due Date:</label>
+    <input type="text" name="newdueDate" value="@Model.GetDueDate()">
+    <button type="submit">Edit</button>
+  </form>
+</div>
+<div class="w3-container">
+  <p><a href="/items">Back to list.</a></p>
+</div>

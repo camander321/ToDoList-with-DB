@@ -1,0 +1,16 @@
+@{
+  Layout = "_Layout";
+}
+
+<div class="w3-container">
+  <hr />
+  <h2>Edit Task: @Model.GetDescription()</h2>
+  <form action="/items/@Model.GetId()/update" method="post">
+    <label for="name">Name:</label>
+    <input type="text" name="newname" value="@Model.GetDescription()">
+    <button type="submit">Edit</button>
+  </form>
+</div>
+<div class="w3-container">
+  <p><a href="/items">Back to list.</a></p>
+</div>

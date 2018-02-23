@@ -11,12 +11,14 @@ namespace ToDoList.Models
     private int _id;
     private string _description;
     private System.DateTime _dueDate;
+    private int _categoryId;
 
-    public Item(string Description, DateTime DueDate, int Id = 0)
+    public Item(string Description, DateTime DueDate, int categoryId, int Id = 0)
     {
       _id = Id;
       _description = Description;
       _dueDate = DueDate;
+      _categoryId = categoryId;
     }
 
     public override bool Equals(System.Object otherItem)
@@ -31,7 +33,8 @@ namespace ToDoList.Models
         bool idEquality = (this.GetId() == newItem.GetId());
         bool descriptionEquality = (this.GetDescription() == newItem.GetDescription());
         bool dueDateEquality = (this.GetDueDate() == newItem.GetDueDate());
-        return (idEquality && descriptionEquality && dueDateEquality);
+        bool categoryEquality = (this.GetCategoryId() == newItem.GetCategoryId());
+        return (idEquality && descriptionEquality && dueDateEquality && categoryEquality);
       }
     }
 
@@ -64,21 +67,26 @@ namespace ToDoList.Models
     {
       _dueDate = newDueDate;
     }
+    public int GetCategoryId()
+    {
+      return _categoryId;
+    }
 
     public static List<Item> GetAll()
     {
       List<Item> allItems = new List<Item> {};
       MySqlConnection conn = DB.Connection();
       conn.Open();
-      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+      var cmd = conn.CreateCommand() as MySqlCommand;
       cmd.CommandText = @"SELECT * FROM items;";
-      MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
       while(rdr.Read())
       {
         int itemId = rdr.GetInt32(0);
         string itemDescription = rdr.GetString(1);
         DateTime itemDueDate = rdr.GetDateTime(2);
-        Item newItem = new Item(itemDescription, itemDueDate, itemId);
+        int itemCategoryId = rdr.GetInt32(3);
+        Item newItem = new Item(itemDescription, itemDueDate, itemCategoryId, itemId);
         allItems.Add(newItem);
       }
       conn.Close();
@@ -90,12 +98,12 @@ namespace ToDoList.Models
     }
 
     public static void DeleteAll()
-   {
+    {
      MySqlConnection conn = DB.Connection();
      conn.Open();
 
      var cmd = conn.CreateCommand() as MySqlCommand;
-     cmd.CommandText = @"DELETE FROM items;";
+     cmd.CommandText = @"TRUNCATE TABLE items;";
 
      cmd.ExecuteNonQuery();
 
@@ -106,14 +114,29 @@ namespace ToDoList.Models
      }
     }
 
+    public static void ResetId()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = "UPDATE items SET id = 0, category_id = 0";
+      cmd.ExecuteNonQuery();
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
     public void Save()
     {
       MySqlConnection conn = DB.Connection();
      conn.Open();
 
      var cmd = conn.CreateCommand() as MySqlCommand;
-    //  cmd.CommandText = @"INSERT INTO `items` (`description`) VALUES (@ItemDescription);";
-    cmd.CommandText = @"INSERT INTO `items` (description, dueDate) VALUES (@ItemDescription, @ItemDueDate);";
+    cmd.CommandText = @"INSERT INTO items (description, dueDate, category_id) VALUES (@ItemDescription, @ItemDueDate, @category_id);";
 
      MySqlParameter description = new MySqlParameter();
      description.ParameterName = "@ItemDescription";
@@ -125,6 +148,11 @@ namespace ToDoList.Models
      dueDate.Value = this._dueDate;
      cmd.Parameters.Add(dueDate);
 
+     MySqlParameter category_id = new MySqlParameter();
+     category_id.ParameterName = "@category_id";
+     category_id.Value = this._categoryId;
+     cmd.Parameters.Add(category_id);
+
      cmd.ExecuteNonQuery();
      _id = (int) cmd.LastInsertedId;
 
@@ -135,33 +163,40 @@ namespace ToDoList.Models
       }
     }
 
+    public void CategoryLookup()
+    {
+      //Is category_id equal to categories Database descriptions?
+    }
+
     public static Item Find(int id)
-   {
+    {
      MySqlConnection conn = DB.Connection();
      conn.Open();
 
      var cmd = conn.CreateCommand() as MySqlCommand;
-     cmd.CommandText = @"SELECT * FROM `items` WHERE id = @thisId;";
+     cmd.CommandText = @"SELECT * FROM items WHERE id = @searchId;";
 
-     MySqlParameter thisId = new MySqlParameter();
-     thisId.ParameterName = "@thisId";
-     thisId.Value = id;
-     cmd.Parameters.Add(thisId);
+     MySqlParameter searchId = new MySqlParameter();
+     searchId.ParameterName = "@searchId";
+     searchId.Value = id;
+     cmd.Parameters.Add(searchId);
 
      var rdr = cmd.ExecuteReader() as MySqlDataReader;
 
      int itemId = 0;
      string itemDescription = "";
      DateTime itemDueDate = DateTime.Now;
+     int itemCategoryId = 0;
 
      while (rdr.Read())
      {
        itemId = rdr.GetInt32(0);
        itemDescription = rdr.GetString(1);
        itemDueDate = rdr.GetDateTime(2);
+       itemCategoryId = rdr.GetInt32(3);
      }
 
-     Item foundItem= new Item(itemDescription,  itemDueDate, itemId);
+     Item foundItem= new Item(itemDescription, itemDueDate, itemCategoryId, itemId);
 
       conn.Close();
       if (conn != null)
@@ -170,6 +205,107 @@ namespace ToDoList.Models
       }
 
      return foundItem;
-   }
+    }
+
+    public void Edit(string newDescription)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"UPDATE items SET description = @newDescription WHERE id = @searchId;";
+
+      MySqlParameter searchId = new MySqlParameter();
+      searchId.ParameterName = "@searchId";
+      searchId.Value = _id;
+      cmd.Parameters.Add(searchId);
+
+      MySqlParameter description = new MySqlParameter();
+      description.ParameterName = "@newdescription";
+      description.Value = newDescription;
+      cmd.Parameters.Add(description);
+
+      cmd.ExecuteNonQuery();
+      _description = newDescription;
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
+    public void EditDueDate(System.DateTime newDueDate)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"UPDATE items SET dueDate = @newDueDate WHERE id = @searchId;";
+
+      MySqlParameter searchId = new MySqlParameter();
+      searchId.ParameterName = "@searchId";
+      searchId.Value = _id;
+      cmd.Parameters.Add(searchId);
+
+      MySqlParameter dueDate = new MySqlParameter();
+      dueDate.ParameterName = "@newDueDate";
+      dueDate.Value = newDueDate;
+      cmd.Parameters.Add(dueDate);
+
+      cmd.ExecuteNonQuery();
+      _dueDate = newDueDate;
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
+    public void DeleteItem(int id)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"DELETE FROM items WHERE id = @searchId;";
+
+      MySqlParameter searchId = new MySqlParameter();
+      searchId.ParameterName = "@searchId";
+      searchId.Value = _id;
+      cmd.Parameters.Add(searchId);
+
+      cmd.ExecuteNonQuery();
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
+    public static List<Item> FilterDueDate()
+    {
+      List<Item> filterByDueDate = new List<Item> {};
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM items ORDER BY dueDate;";
+      MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+      while(rdr.Read())
+      {
+        int itemId = rdr.GetInt32(0);
+        string itemDescription = rdr.GetString(1);
+        DateTime itemDueDate = rdr.GetDateTime(2);
+        int itemCategoryId = rdr.GetInt32(3);
+        Item newItem = new Item(itemDescription, itemDueDate, itemCategoryId, itemId);
+        filterByDueDate.Add(newItem);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+          conn.Dispose();
+      }
+      return filterByDueDate;
+    }
   }
 }

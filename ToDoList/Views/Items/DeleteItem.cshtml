@@ -1,0 +1,16 @@
+@{
+  Layout = "_Layout";
+}
+
+<div class="w3-container" align="center">
+  <hr />
+  <h1>Are you sure you want to delete @Model.GetDescription()?</h1>
+  <form action="/items/@Model.GetId()/delete" method="post">
+    <button type="submit">Yes</button>
+  </form>
+  <h4><a href="/">No</a></h4>
+</div>
+<div class="w3-container">
+  <p><a href="/items/new">Add an item.</a></p>
+  <p><a href="/items">Back to list.</a></p>
+</div>
