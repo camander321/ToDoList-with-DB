@@ -10,9 +10,18 @@
       <label for="new-description">Item description:</label>
       <input id="new-description" name="new-description" type="text">
       <label for="new-duedate">Item Due Date:</label>
-      <input id="new-duedate" name="new-duedate" type="datetime">
+      <input id="new-duedate" name="new-duedate" type="date">
+
       <label for="category">Category: </label>
-      <input id="category" name="category" type="text">
+      <select id="category" name="category">
+        @{
+          foreach(var cat in ToDoList.Models.Category.GetAll())
+          {
+            <option value='@cat.GetId()'>@cat.GetCategoryName()</option>
+          }
+        }
+      </select>
+
       <button type="submit">Submit</button>
     </form>
     <br>

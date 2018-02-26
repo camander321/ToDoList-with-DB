@@ -10,7 +10,7 @@ namespace ToDoList.Tests
   {
       public void ItemTests()
       {
-        DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=todolist_test;";
+        DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=todo;";
       }
 
       public void Dispose()
@@ -258,7 +258,7 @@ namespace ToDoList.Tests
         testCategory.Save();
 
         string testDescription = "Mow the lawn";
-        System.DateTime dueDate = System.DateTime.Parse("03/16/2018");
+        DateTime dueDate = DateTime.Parse("03/16/2018");
         Item testItem = new Item(testDescription, dueDate);
         testItem.Save();
 
@@ -271,6 +271,29 @@ namespace ToDoList.Tests
 
         //Assert
         CollectionAssert.AreEqual(testCategoryItems, resultCategoryItems);
+      }
+
+      [TestMethod]
+      public void MarkAsDone_FlagsItemAsBeingCompleted_Void()
+      {
+        Item testItem1 = new Item("test 1", DateTime.Parse("03/16/2018"));
+        testItem1.Save();
+        testItem1.MarkAsDone(true);
+
+
+        Item testItem2 = new Item("test 2", DateTime.Parse("03/17/2018"));
+        testItem2.Save();
+        testItem2.MarkAsDone(false);
+
+        Item testItem3 = new Item("test 3", DateTime.Parse("03/18/2018"));
+        testItem3.Save();
+        testItem3.MarkAsDone(true);
+
+        List<Item> testItems = new List<Item> {testItem1, testItem3};
+        List<Item> resultItems = Item.GetCompleted(true);
+
+        Assert.AreEqual(testItems.Count, resultItems.Count);
+        CollectionAssert.AreEqual(testItems, resultItems);
       }
     }
 }

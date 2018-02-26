@@ -11,7 +11,7 @@ namespace ToDoList.Controllers
         public ActionResult Index()
         {
             List<Item> allItems = Item.GetAll();
-            return View(allItems);
+            return View("Index", allItems);
         }
     }
 }

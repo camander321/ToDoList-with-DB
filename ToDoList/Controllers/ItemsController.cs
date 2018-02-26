@@ -26,13 +26,13 @@ namespace ToDoList.Controllers
         {
           string newDueDate = Request.Form["new-duedate"];
           System.DateTime parsedDueDate = System.DateTime.Parse(newDueDate);
+          
+          int categoryId = int.Parse(Request.Form["category"]);
+          Category category = Category.Find(categoryId);
 
-          Category newCategory = new Category(Request.Form["category"]);
-          newCategory.Save();
-          int categoryId = newCategory.GetId();
-
-          Item newItem = new Item (Request.Form["new-description"], parsedDueDate, categoryId);
+          Item newItem = new Item (Request.Form["new-description"], parsedDueDate);
           newItem.Save();
+          newItem.AddCategory(category);
 
           List<Item> allItems = Item.GetAll();
           return View("~/Views/Home/Index.cshtml", allItems);

@@ -37,12 +37,15 @@
                 <li>@item.GetDueDate().ToShortDateString() | <a href="/items/@item.GetId()/duedateupdate">Edit</a></li>
               }
           </div>
-          <div class="w3-quarter w3w3-container">
+          <div class="w3-quarter w3-container">
             <h2>Category</h2>
-
-              @foreach(var item in Model)
+              @foreach(var item in @Model)
               {
-                <li>@item.GetCategoryId()</li>
+                System.Console.WriteLine("Item id: " + item.GetId());
+                System.Console.WriteLine("Category Count: " + item.GetCategories().Count);
+                System.Console.WriteLine("Item Description: " + item.GetDescription());
+                System.Console.WriteLine("First Category: " + item.GetCategories()[0].GetCategoryName());
+                <li>@item.GetCategories()[0].GetCategoryName()</li>
               }
           </div>
           <div class="w3-quarter w3-container">

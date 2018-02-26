@@ -10,13 +10,14 @@ namespace ToDoList.Tests
   {
       public void CategoryTests()
       {
-        DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=todolist_test;";
+        DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=todo;";
       }
 
       public void Dispose()
       {
         Item.DeleteAll();
         Category.DeleteAll();
+        categories_items.DeleteAll();
       }
 
       [TestMethod]
@@ -86,25 +87,28 @@ namespace ToDoList.Tests
         Assert.AreEqual(testCategory, foundCategory);
       }
 
-      // [TestMethod]
-      // public void GetItems_RetrievesAllItemsWithCategory_ItemList()
-      // {
-      //   Category testCategory = new Category("Household chores");
-      //   testCategory.Save();
-      //
-      //   string description1 = "Mow the Lawn";
-      //   System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-      //   Item firstItem = new Item(description1, dueDate, testCategory.GetId());
-      //   firstItem.Save();
-      //
-      //   string description2 = "Wash the dishes";
-      //   Item secondItem = new Item(description2, dueDate, testCategory.GetId());
-      //   secondItem.Save();
-      //
-      //   List<Item> testItemList = new List<Item> {firstItem, secondItem};
-      //   List<Item> resultItemList = testCategory.GetItems();
-      //
-      //   CollectionAssert.AreEqual(testItemList, resultItemList);
-      // }
+      [TestMethod]
+      public void GetItems_RetrievesAllItemsWithCategory_ItemList()
+      {
+        Category testCategory = new Category("Household chores");
+        testCategory.Save();
+
+        string description1 = "Mow the Lawn";
+        System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
+        Item firstItem = new Item(description1, dueDate);
+        firstItem.Save();
+
+        string description2 = "Wash the dishes";
+        Item secondItem = new Item(description2, dueDate);
+        secondItem.Save();
+
+        firstItem.AddCategory(testCategory);
+        secondItem.AddCategory(testCategory);
+        List<Item> testItemList = new List<Item> {firstItem, secondItem};
+        List<Item> resultItemList = testCategory.GetItems();
+
+        Assert.AreEqual(testItemList.Count, resultItemList.Count);
+        CollectionAssert.AreEqual(testItemList, resultItemList);
+      }
   }
 }
