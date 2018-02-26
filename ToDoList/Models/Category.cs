@@ -199,35 +199,54 @@ namespace ToDoList.Models
 
     public List<Item> GetItems()
     {
-      List<Item> allCategoryItems = new List<Item> {};
       MySqlConnection conn = DB.Connection();
       conn.Open();
       var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"SELECT * FROM items WHERE category_id = @category_id;";
+      cmd.CommandText = @"SELECT item_id FROM categories_items WHERE category_id = @category_id;";
 
-      MySqlParameter categoryId = new MySqlParameter();
-      categoryId.ParameterName = "@category_id";
-      categoryId.Value = this._id;
-      cmd.Parameters.Add(categoryId);
+      MySqlParameter categoryIdParameter = new MySqlParameter();
+      categoryIdParameter.ParameterName = "@category_id";
+      categoryIdParameter.Value = _id;
+      cmd.Parameters.Add(categoryIdParameter);
 
       var rdr = cmd.ExecuteReader() as MySqlDataReader;
+
+      List<int> itemIds = new List<int> {};
       while(rdr.Read())
       {
         int itemId = rdr.GetInt32(0);
-        string itemDescription = rdr.GetString(1);
-        DateTime itemDueDate = rdr.GetDateTime(2);
-        int itemCategoryId = rdr.GetInt32(3);
-        Item newItem = new Item(itemDescription, itemDueDate, itemCategoryId, itemId);
-        allCategoryItems.Add(newItem);
+        itemIds.Add(itemId);
       }
+      rdr.Dispose();
 
+      List<Item> items = new List<Item> {};
+      foreach (int itemId in itemIds)
+      {
+        var itemQuery = conn.CreateCommand() as MySqlCommand;
+        itemQuery.CommandText = @"SELECT * FROM categories WHERE id = @ItemId;";
+
+        MySqlParameter itemIdParameter = new MySqlParameter();
+        itemIdParameter.ParameterName = "@CategoryId";
+        itemIdParameter.Value = itemId;
+        itemQuery.Parameters.Add(itemIdParameter);
+
+        var itemQueryRdr = itemQuery.ExecuteReader() as MySqlDataReader;
+        while(itemQueryRdr.Read())
+        {
+          int thisItemId = itemQueryRdr.GetInt32(0);
+          string itemDescription = itemQueryRdr.GetString(1);
+          DateTime itemDueDate = itemQueryRdr.GetDateTime(2);
+          Item foundItem = new Item(itemDescription, itemDueDate, thisItemId);
+          items.Add(foundItem);
+        }
+      }
       conn.Close();
       if (conn != null)
       {
         conn.Dispose();
       }
 
-      return allCategoryItems;
+      return items;
     }
   }
 }

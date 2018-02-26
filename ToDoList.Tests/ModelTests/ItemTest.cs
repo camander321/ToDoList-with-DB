@@ -17,6 +17,7 @@ namespace ToDoList.Tests
       {
         Item.DeleteAll();
         Category.DeleteAll();
+        categories_items.DeleteAll();
       }
 
       [TestMethod]
@@ -34,8 +35,8 @@ namespace ToDoList.Tests
       {
         // Arrange
         System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item firstItem = new Item("Mow the lawn", dueDate, 1);
-        Item secondItem = new Item("Mow the lawn", dueDate, 1);
+        Item firstItem = new Item("Mow the lawn", dueDate);
+        Item secondItem = new Item("Mow the lawn", dueDate);
 
         //Act
         firstItem.Save();
@@ -52,7 +53,7 @@ namespace ToDoList.Tests
         //Arrange
         string description = "Mow the Lawn";
         System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item testItem = new Item(description, dueDate, 1);
+        Item testItem = new Item(description, dueDate);
 
         //Act
         testItem.Save();
@@ -69,7 +70,7 @@ namespace ToDoList.Tests
         //Arrange
         string description = "Mow the Lawn";
         System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item testItem = new Item(description, dueDate, 1);
+        Item testItem = new Item(description, dueDate);
         testItem.Save();
 
         //Act
@@ -88,7 +89,7 @@ namespace ToDoList.Tests
         //Arrange
         string description = "Walk the dog.";
         System.DateTime dueDate = System.DateTime.Today;
-        Item newItem = new Item(description, dueDate, 1);
+        Item newItem = new Item(description, dueDate);
 
         //Act
         string result = newItem.GetDescription();
@@ -102,7 +103,7 @@ namespace ToDoList.Tests
       {
         //Arrange
         System.DateTime dueDate = System.DateTime.Today;
-        Item newItem = new Item("Do Task", dueDate, 1);
+        Item newItem = new Item("Do Task", dueDate);
 
         //Act
         DateTime result = newItem.GetDueDate();
@@ -119,8 +120,8 @@ namespace ToDoList.Tests
         string description01 = "Walk the dog";
         string description02 = "Wash the dishes";
         System.DateTime dueDate = System.DateTime.Today;
-        Item newItem1 = new Item(description01, dueDate, 1);
-        Item newItem2 = new Item(description02, dueDate, 1);
+        Item newItem1 = new Item(description01, dueDate);
+        Item newItem2 = new Item(description02, dueDate);
         List<Item> newList = new List<Item> {newItem1, newItem2};
 
         //Act
@@ -137,7 +138,7 @@ namespace ToDoList.Tests
       {
         //Arrange
         System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item testItem = new Item("Mow the lawn", dueDate, 1);
+        Item testItem = new Item("Mow the lawn", dueDate);
 
         //Act
         testItem.Save();
@@ -156,7 +157,7 @@ namespace ToDoList.Tests
       {
         //Arrange
         System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item testItem = new Item("Mow the lawn", dueDate, 1);
+        Item testItem = new Item("Mow the lawn", dueDate);
         testItem.Save();
 
         //Act
@@ -172,7 +173,7 @@ namespace ToDoList.Tests
         //Arrange
         string firstDescription = "Walk the Dog";
         System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item testItem = new Item(firstDescription, dueDate, 1);
+        Item testItem = new Item(firstDescription, dueDate);
         testItem.Save();
         string secondDescription = "Mow the lawn";
 
@@ -191,8 +192,8 @@ namespace ToDoList.Tests
         string firstDescription = "Walk the Dog";
         string secondDescription = "Mow the lawn";
         System.DateTime dueDate = System.DateTime.Parse("03/16/2018");
-        Item firstItem = new Item(firstDescription, dueDate, 1);
-        Item secondItem = new Item(secondDescription, dueDate, 2);
+        Item firstItem = new Item(firstDescription, dueDate);
+        Item secondItem = new Item(secondDescription, dueDate);
         List<Item> testList = new List<Item>{secondItem};
         firstItem.Save();
         secondItem.Save();
@@ -206,6 +207,70 @@ namespace ToDoList.Tests
         Assert.AreEqual(testList.Count, compareList.Count);
       }
 
+      [TestMethod]
+      public void AddCategory_AddsCategoryToItem_CategoryList()
+      {
+        //Arrange
+        System.DateTime dueDate = System.DateTime.Parse("03/16/2018");
+        Item testItem1 = new Item("Mow the lawn", dueDate);
+        testItem1.Save();
 
+        Category testCategory = new Category("Home Stuff");
+        testCategory.Save();
+
+        //Act
+        testItem1.AddCategory(testCategory);
+        List<Category> result = testItem1.GetCategories();
+        List<Category> testList = new List<Category>{testCategory};
+
+        //Assert
+        CollectionAssert.AreEqual(testList, result);
+      }
+
+      [TestMethod]
+      public void GetCategories_ReturnsAllItemCategories_CategoryList()
+      {
+        //Arrange
+        System.DateTime dueDate = System.DateTime.Parse("03/16/2018");
+        Item testItem1 = new Item("Mow the lawn", dueDate);
+        testItem1.Save();
+
+        Category testCategory1 = new Category("Home stuff");
+        testCategory1.Save();
+
+        Category testCategory2 = new Category("Work stuff");
+        testCategory2.Save();
+
+        //Act
+        testItem1.AddCategory(testCategory1);
+        List<Category> result = testItem1.GetCategories();
+        List<Category> testList = new List<Category> {testCategory1};
+
+        //Assert
+        CollectionAssert.AreEqual(testList, result);
+      }
+
+      [TestMethod]
+      public void Delete_DeletesItemAssociationFromDatabase_ItemList()
+      {
+        //Arrange
+        Category testCategory = new Category("Home stuff");
+        testCategory.Save();
+
+        string testDescription = "Mow the lawn";
+        System.DateTime dueDate = System.DateTime.Parse("03/16/2018");
+        Item testItem = new Item(testDescription, dueDate);
+        testItem.Save();
+
+        //Act
+        testItem.AddCategory(testCategory);
+        testItem.Delete();
+
+        List<Item> resultCategoryItems = testCategory.GetItems();
+        List<Item> testCategoryItems = new List<Item> {};
+
+        //Assert
+        CollectionAssert.AreEqual(testCategoryItems, resultCategoryItems);
+      }
     }
 }

@@ -86,25 +86,25 @@ namespace ToDoList.Tests
         Assert.AreEqual(testCategory, foundCategory);
       }
 
-      [TestMethod]
-      public void GetItems_RetrievesAllItemsWithCategory_ItemList()
-      {
-        Category testCategory = new Category("Household chores");
-        testCategory.Save();
-
-        string description1 = "Mow the Lawn";
-        System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
-        Item firstItem = new Item(description1, dueDate, testCategory.GetId());
-        firstItem.Save();
-
-        string description2 = "Wash the dishes";
-        Item secondItem = new Item(description2, dueDate, testCategory.GetId());
-        secondItem.Save();
-
-        List<Item> testItemList = new List<Item> {firstItem, secondItem};
-        List<Item> resultItemList = testCategory.GetItems();
-
-        CollectionAssert.AreEqual(testItemList, resultItemList);
-      }
+      // [TestMethod]
+      // public void GetItems_RetrievesAllItemsWithCategory_ItemList()
+      // {
+      //   Category testCategory = new Category("Household chores");
+      //   testCategory.Save();
+      //
+      //   string description1 = "Mow the Lawn";
+      //   System.DateTime dueDate = System.DateTime.Parse("03/15/2018");
+      //   Item firstItem = new Item(description1, dueDate, testCategory.GetId());
+      //   firstItem.Save();
+      //
+      //   string description2 = "Wash the dishes";
+      //   Item secondItem = new Item(description2, dueDate, testCategory.GetId());
+      //   secondItem.Save();
+      //
+      //   List<Item> testItemList = new List<Item> {firstItem, secondItem};
+      //   List<Item> resultItemList = testCategory.GetItems();
+      //
+      //   CollectionAssert.AreEqual(testItemList, resultItemList);
+      // }
   }
 }
